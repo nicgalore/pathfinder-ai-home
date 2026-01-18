@@ -70,12 +70,12 @@ const Assist = () => {
     <Layout>
       {/* Full viewport container - mobile first */}
       <div className="fixed inset-0 flex flex-col pb-20">
-        {/* Speech Wave Visualization - Top center overlay */}
+        {/* Speech Wave Visualization - Top center, transparent background */}
         <div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 z-20 pt-[env(safe-area-inset-top,8px)] mt-2"
-          style={{ paddingTop: "max(env(safe-area-inset-top, 8px), 8px)" }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 z-20"
+          style={{ paddingTop: "max(env(safe-area-inset-top, 0px) + 16px, 24px)" }}
         >
-          <SpeechWave enabled={isMicActive} className="h-8" />
+          <SpeechWave enabled={isMicActive} className="h-10" />
         </div>
 
         {/* Camera Feed Container - Dominant element */}
@@ -108,40 +108,6 @@ const Assist = () => {
             </div>
           )}
 
-          {/* Glassmorphism status badges - top center */}
-          <div 
-            className="absolute top-0 inset-x-0 z-10 pointer-events-none"
-            style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 12px)" }}
-          >
-            <div className="flex justify-center gap-2 px-4">
-              {/* System Status Badge */}
-              <div 
-                className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 shadow-lg"
-                role="status"
-                aria-live="polite"
-              >
-                <p className="text-xs font-medium text-white drop-shadow-sm">
-                  {isMicActive ? "Listening" : "Processing"}
-                </p>
-              </div>
-              
-              {/* Active Mode Badge */}
-              <div 
-                className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 shadow-lg"
-                aria-hidden="true"
-              >
-                <p className="text-xs font-medium text-white drop-shadow-sm">
-                  {isCameraActive && isMicActive
-                    ? "Full Assist"
-                    : isCameraActive
-                      ? "Vision Mode"
-                      : isMicActive
-                        ? "Voice Mode"
-                        : "Standby"}
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* Error overlay */}
           {(cameraError || micError) && (
