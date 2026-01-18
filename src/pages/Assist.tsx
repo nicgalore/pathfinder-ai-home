@@ -1,15 +1,18 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Mic, MicOff, Camera, CameraOff } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { StatusOrb } from "@/components/StatusOrb";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useMediaDevices } from "@/hooks/useMediaDevices";
 import { useAudioAnalyzer } from "@/hooks/useAudioAnalyzer";
+import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
 const Assist = () => {
   const { announceOnLoad, speak } = useVoiceAnnouncement();
   const [caption, setCaption] = useState<string>("");
   const [captionKey, setCaptionKey] = useState(0);
+  const [wakeWordEnabled, setWakeWordEnabled] = useState(true);
+  const hasActivatedRef = useRef(false);
   
   const showCaption = useCallback((text: string) => {
     setCaption(text);
@@ -24,11 +27,59 @@ const Assist = () => {
     micError,
     toggleCamera,
     toggleMicrophone,
+    startCamera,
+    startMicrophone,
   } = useMediaDevices({
     onError: (error) => {
       speak(error, "assertive");
       showCaption(error);
     },
+  });
+
+  // Wake word activation handler
+  const activateAssistMode = useCallback(async () => {
+    if (hasActivatedRef.current) return;
+    hasActivatedRef.current = true;
+    setWakeWordEnabled(false);
+    
+    const msg = "Starting assistance...";
+    speak(msg, "polite");
+    showCaption(msg);
+    
+    // Start camera first
+    const cameraStarted = await startCamera();
+    if (cameraStarted) {
+      showCaption("Camera activated.");
+    }
+    
+    // Then start microphone
+    const micStarted = await startMicrophone();
+    if (micStarted) {
+      showCaption("Microphone activated. Listening.");
+    }
+    
+    if (cameraStarted && micStarted) {
+      setTimeout(() => {
+        showCaption("Assistance mode ready.");
+      }, 1000);
+    }
+  }, [speak, showCaption, startCamera, startMicrophone]);
+
+  // Wake word voice commands
+  const wakeWordCommands = useCallback(() => [
+    {
+      phrases: ["start assistance", "start assist", "begin assistance", "activate"],
+      action: activateAssistMode,
+    },
+  ], [activateAssistMode]);
+
+  // Wake word listener - starts on page load
+  useVoiceRecognition({
+    commands: wakeWordCommands(),
+    onCommandDetected: (phrase) => {
+      console.log("Wake word detected:", phrase);
+    },
+    enabled: wakeWordEnabled && !isCameraActive && !isMicActive,
   });
 
   // Audio analyzer for voice activity visualization
@@ -40,7 +91,7 @@ const Assist = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const msg = "Assist mode active. Press the camera or microphone button to start.";
+      const msg = "Assist mode. Say 'Start Assistance' or tap a button to begin.";
       announceOnLoad(msg);
       showCaption(msg);
     }, 500);
