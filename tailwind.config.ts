@@ -85,11 +85,22 @@ export default {
   				to: {
   					height: '0'
   				}
+  			},
+  			'caption-enter': {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateY(12px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateY(0)'
+  				}
   			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+  			'caption-enter': 'caption-enter 0.35s ease-out forwards'
   		},
   		fontFamily: {
   			sans: [

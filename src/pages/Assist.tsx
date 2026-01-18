@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Mic, MicOff, Camera, CameraOff } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SpeechWave } from "@/components/SpeechWave";
@@ -7,6 +7,14 @@ import { useMediaDevices } from "@/hooks/useMediaDevices";
 
 const Assist = () => {
   const { announceOnLoad, speak } = useVoiceAnnouncement();
+  const [caption, setCaption] = useState<string>("");
+  const [captionKey, setCaptionKey] = useState(0);
+  
+  const showCaption = useCallback((text: string) => {
+    setCaption(text);
+    setCaptionKey((prev) => prev + 1);
+  }, []);
+
   const {
     videoRef,
     isCameraActive,
@@ -16,44 +24,47 @@ const Assist = () => {
     toggleCamera,
     toggleMicrophone,
   } = useMediaDevices({
-    onError: (error) => speak(error, "assertive"),
+    onError: (error) => {
+      speak(error, "assertive");
+      showCaption(error);
+    },
   });
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      announceOnLoad(
-        "Assist mode active. Press the camera or microphone button to start."
-      );
+      const msg = "Assist mode active. Press the camera or microphone button to start.";
+      announceOnLoad(msg);
+      showCaption(msg);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [announceOnLoad]);
+  }, [announceOnLoad, showCaption]);
 
   const handleCameraToggle = async () => {
     const started = await toggleCamera();
     if (started) {
-      speak("Camera activated.", "polite");
+      const msg = "Camera activated.";
+      speak(msg, "polite");
+      showCaption(msg);
     } else if (!cameraError) {
-      speak("Camera stopped.", "polite");
+      const msg = "Camera stopped.";
+      speak(msg, "polite");
+      showCaption(msg);
     }
   };
 
   const handleMicToggle = async () => {
     const started = await toggleMicrophone();
     if (started) {
-      speak("Microphone activated. Listening.", "polite");
+      const msg = "Microphone activated. Listening.";
+      speak(msg, "polite");
+      showCaption(msg);
     } else if (!micError) {
-      speak("Microphone stopped.", "polite");
+      const msg = "Microphone stopped.";
+      speak(msg, "polite");
+      showCaption(msg);
     }
   };
-
-  const statusText = isCameraActive && isMicActive
-    ? "Camera and microphone active"
-    : isCameraActive
-      ? "Camera active"
-      : isMicActive
-        ? "Microphone active"
-        : "Tap to begin";
 
   return (
     <Layout>
@@ -148,6 +159,25 @@ const Assist = () => {
             </div>
           )}
         </div>
+
+        {/* Caption display - above control buttons */}
+        {caption && (
+          <div 
+            className="absolute bottom-44 inset-x-0 z-10 flex justify-center px-4 pointer-events-none"
+            style={{ bottom: "max(env(safe-area-inset-bottom, 0px) + 176px, 176px)" }}
+          >
+            <div 
+              key={captionKey}
+              className="max-w-md rounded-full bg-black/70 backdrop-blur-sm px-6 py-3 shadow-2xl animate-caption-enter"
+              role="status"
+              aria-live="polite"
+            >
+              <p className="text-lg sm:text-xl font-bold text-white text-center font-sans tracking-tight drop-shadow-md">
+                {caption}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Control buttons overlay - bottom, above nav */}
         <div 
