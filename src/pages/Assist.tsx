@@ -150,8 +150,8 @@ const Assist = () => {
                 : "Tap the buttons above to activate camera or microphone assistance."}
         </p>
 
-        {/* Speech Wave Visualization */}
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-10">
+        {/* Speech Wave Visualization - Top center, respects safe areas */}
+        <div className="fixed top-0 left-1/2 -translate-x-1/2 z-10 pt-[env(safe-area-inset-top,12px)] mt-3">
           <SpeechWave enabled={isMicActive} className="h-8" />
         </div>
       </div>
