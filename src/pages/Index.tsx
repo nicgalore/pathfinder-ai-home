@@ -12,8 +12,8 @@ const Index = () => {
   const { announceOnLoad, speak } = useVoiceAnnouncement();
   const [commandStatus, setCommandStatus] = useState("");
 
-  const handleStartAssistance = useCallback(() => {
-    navigate("/assist");
+  const handleStartAssistance = useCallback((viaVoice = false) => {
+    navigate("/assist", { state: { voiceStart: viaVoice } });
   }, [navigate]);
 
   const handleCommandDetected = useCallback((phrase: string) => {
@@ -30,7 +30,7 @@ const Index = () => {
           "help me navigate",
           "start"
         ],
-        action: handleStartAssistance,
+        action: () => handleStartAssistance(true),
       },
     ],
     [handleStartAssistance]
@@ -80,7 +80,7 @@ const Index = () => {
           </h2>
           <button
             type="button"
-            onClick={handleStartAssistance}
+            onClick={() => handleStartAssistance(false)}
             className="btn-primary-large"
             aria-describedby="start-description"
           >
