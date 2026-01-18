@@ -2,7 +2,7 @@ import { useEffect, useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { Layout } from "@/components/Layout";
-import { SpeechWave } from "@/components/SpeechWave";
+
 import { PhoneSonarAnimation } from "@/components/PhoneSonarAnimation";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
@@ -59,10 +59,6 @@ const Index = () => {
         {commandStatus}
       </div>
 
-      {/* Speech Wave Visualization */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 z-10 pt-[env(safe-area-inset-top,12px)] mt-3">
-        <SpeechWave enabled={isListening} className="h-8" />
-      </div>
 
       <div className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6">
         {/* Phone Sonar Animation - Object Awareness */}
