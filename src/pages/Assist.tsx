@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Mic, MicOff, Camera, CameraOff } from "lucide-react";
 import { Layout } from "@/components/Layout";
-import { SpeechWave } from "@/components/SpeechWave";
+import { StatusOrb } from "@/components/StatusOrb";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useMediaDevices } from "@/hooks/useMediaDevices";
 
@@ -70,12 +70,12 @@ const Assist = () => {
     <Layout>
       {/* Full viewport container - mobile first */}
       <div className="fixed inset-0 flex flex-col pb-20">
-        {/* Speech Wave Visualization - Top center, transparent background */}
+        {/* Status Orb - Top center, transparent background */}
         <div 
           className="absolute top-0 left-1/2 -translate-x-1/2 z-20"
           style={{ paddingTop: "max(env(safe-area-inset-top, 0px) + 16px, 24px)" }}
         >
-          <SpeechWave enabled={isMicActive} className="h-10" />
+          <StatusOrb size={60} />
         </div>
 
         {/* Camera Feed Container - Dominant element */}
