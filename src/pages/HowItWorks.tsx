@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { Mic, Camera, Volume2, Navigation } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
+import illustrationChair from "@/assets/illustration-chair.png";
+import illustrationLamp from "@/assets/illustration-lamp.png";
 
 const steps = [
   {
@@ -49,7 +51,33 @@ const HowItWorks = () => {
         className="sr-only"
       />
 
-      <div className="px-6 py-10">
+      {/* Decorative illustrations - hidden from screen readers */}
+      <div 
+        className="fixed bottom-24 right-4 opacity-30 pointer-events-none hidden md:block"
+        aria-hidden="true"
+        role="presentation"
+      >
+        <img 
+          src={illustrationChair} 
+          alt="" 
+          className="w-28 lg:w-36"
+          loading="lazy"
+        />
+      </div>
+      <div 
+        className="fixed top-32 left-4 opacity-25 pointer-events-none hidden lg:block"
+        aria-hidden="true"
+        role="presentation"
+      >
+        <img 
+          src={illustrationLamp} 
+          alt="" 
+          className="w-24"
+          loading="lazy"
+        />
+      </div>
+
+      <div className="relative px-6 py-10">
         <header className="mb-10 text-center">
           <h1 className="mb-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             How It Works
@@ -59,7 +87,7 @@ const HowItWorks = () => {
           </p>
         </header>
 
-        <ol className="mx-auto max-w-lg space-y-6" aria-label="Steps to use PathFinder AI">
+        <ol className="relative z-10 mx-auto max-w-lg space-y-6" aria-label="Steps to use PathFinder AI">
           {steps.map((step, index) => (
             <li
               key={step.title}
