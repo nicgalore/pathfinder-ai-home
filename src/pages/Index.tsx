@@ -11,6 +11,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { announceOnLoad, speak } = useVoiceAnnouncement();
   const [commandStatus, setCommandStatus] = useState("");
+  const [uiListening, setUiListening] = useState(false);
 
   const handleStartAssistance = useCallback((viaVoice = false) => {
     navigate("/assist", { state: { voiceStart: viaVoice } });
@@ -41,6 +42,17 @@ const Index = () => {
     onCommandDetected: handleCommandDetected,
     enabled: true,
   });
+
+  // Prevent UI flicker when the SpeechRecognition engine auto-restarts
+  useEffect(() => {
+    if (isListening) {
+      setUiListening(true);
+      return;
+    }
+
+    const t = setTimeout(() => setUiListening(false), 800);
+    return () => clearTimeout(t);
+  }, [isListening]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -92,13 +104,13 @@ const Index = () => {
           <div className="mt-6 flex flex-col items-center gap-3 h-[120px]">
             <StatusOrb 
               size={48} 
-              isListening={isListening} 
-              audioLevel={isListening ? 0.15 : 0} 
+              isListening={uiListening} 
+              audioLevel={uiListening ? 0.15 : 0} 
             />
             <p className="text-base font-medium text-foreground sm:text-lg">
               Or say <span className="font-bold text-primary">"Start Assistance"</span> to begin
             </p>
-            <span className={`text-sm text-muted-foreground transition-opacity duration-300 ${isListening ? 'opacity-100 animate-pulse' : 'opacity-0'}`}>
+            <span className="text-sm text-muted-foreground opacity-90">
               Listening...
             </span>
           </div>
