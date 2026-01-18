@@ -16,10 +16,11 @@ export function BottomNavigation() {
       aria-label="Main navigation"
       className="fixed bottom-0 left-0 right-0 z-[100] h-16 bg-white border-t border-gray-200 dark:bg-gray-950 dark:border-gray-800"
     >
-      <ul className="flex w-full">
+      <ul className="flex w-full h-full">
         {navItems.map((item) => {
           const isActive =
             item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
+          const IconComponent = item.icon;
 
           return (
             <li key={item.to} className="flex-1">
@@ -28,10 +29,11 @@ export function BottomNavigation() {
                 aria-current={isActive ? "page" : undefined}
                 className={`nav-item ${isActive ? "nav-item-active" : ""}`}
               >
-                <item.icon
+                <IconComponent
                   className="nav-item-icon"
                   aria-hidden="true"
-                  strokeWidth={isActive ? 2.5 : 2}
+                  strokeWidth={1.75}
+                  fill={isActive ? "currentColor" : "none"}
                 />
                 <span className="nav-item-label">{item.label}</span>
               </NavLink>
