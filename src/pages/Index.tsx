@@ -17,8 +17,8 @@ const Index = () => {
   }, [navigate]);
 
   const handleCommandDetected = useCallback((phrase: string) => {
-    setCommandStatus(`Voice command detected: ${phrase}. Starting assistance.`);
-    speak("Starting assistance.", "assertive");
+    setCommandStatus(`Voice command detected: ${phrase}. Navigating to Assist.`);
+    speak("Navigating to Assist.", "assertive");
   }, [speak]);
 
   const voiceCommands = useMemo(
