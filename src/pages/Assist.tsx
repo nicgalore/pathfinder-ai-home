@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { Mic, MicOff, Camera, CameraOff } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { StatusOrb } from "@/components/StatusOrb";
@@ -7,11 +8,18 @@ import { useMediaDevices } from "@/hooks/useMediaDevices";
 import { useAudioAnalyzer } from "@/hooks/useAudioAnalyzer";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
+interface LocationState {
+  voiceStart?: boolean;
+}
+
 const Assist = () => {
+  const location = useLocation();
+  const { voiceStart } = (location.state as LocationState) || {};
+  
   const { announceOnLoad, speak } = useVoiceAnnouncement();
   const [caption, setCaption] = useState<string>("");
   const [captionKey, setCaptionKey] = useState(0);
-  const [wakeWordEnabled, setWakeWordEnabled] = useState(true);
+  const [wakeWordEnabled, setWakeWordEnabled] = useState(!voiceStart);
   const hasActivatedRef = useRef(false);
   
   const showCaption = useCallback((text: string) => {
@@ -89,7 +97,21 @@ const Assist = () => {
     silenceThreshold: 0.05,
   });
 
+  // Auto-activate if arriving via voice command
   useEffect(() => {
+    if (voiceStart && !hasActivatedRef.current) {
+      // Small delay to let the page render first
+      const timer = setTimeout(() => {
+        activateAssistMode();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [voiceStart, activateAssistMode]);
+
+  // Initial announcement (only if not voice-started)
+  useEffect(() => {
+    if (voiceStart) return; // Skip announcement if auto-activating
+    
     const timer = setTimeout(() => {
       const msg = "Assist mode. Say 'Start Assistance' or tap a button to begin.";
       announceOnLoad(msg);
@@ -97,7 +119,7 @@ const Assist = () => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [announceOnLoad, showCaption]);
+  }, [announceOnLoad, showCaption, voiceStart]);
 
   const handleCameraToggle = async () => {
     const started = await toggleCamera();
