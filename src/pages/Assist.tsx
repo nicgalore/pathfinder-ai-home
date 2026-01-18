@@ -134,11 +134,11 @@ const Assist = () => {
           >
             <div 
               key={captionKey}
-              className="max-w-md rounded-full bg-black/70 backdrop-blur-sm px-6 py-3 shadow-2xl animate-caption-enter"
+              className="max-w-xs sm:max-w-sm rounded-full bg-black/65 backdrop-blur-sm px-5 py-2 shadow-xl animate-caption-enter"
               role="status"
               aria-live="polite"
             >
-              <p className="text-lg sm:text-xl font-bold text-white text-center font-sans tracking-tight drop-shadow-md">
+              <p className="text-base sm:text-lg font-bold text-white text-center font-sans tracking-tight drop-shadow-sm">
                 {caption}
               </p>
             </div>
