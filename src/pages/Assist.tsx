@@ -47,24 +47,29 @@ const Assist = () => {
     }
   };
 
+  const statusText = isCameraActive && isMicActive
+    ? "Camera and microphone active"
+    : isCameraActive
+      ? "Camera active"
+      : isMicActive
+        ? "Microphone active"
+        : "Tap to begin";
+
   return (
     <Layout>
-      <div className="flex min-h-[calc(100vh-80px)] flex-col px-6 py-8">
-        <header className="mb-6 text-center">
-          <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Assistance Mode
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            {isCameraActive || isMicActive
-              ? "Assistance is active"
-              : "Tap camera or microphone to begin"}
-          </p>
-        </header>
+      {/* Full viewport container - mobile first */}
+      <div className="fixed inset-0 flex flex-col pb-20">
+        {/* Speech Wave Visualization - Top center overlay */}
+        <div 
+          className="absolute top-0 left-1/2 -translate-x-1/2 z-20 pt-[env(safe-area-inset-top,8px)] mt-2"
+          style={{ paddingTop: "max(env(safe-area-inset-top, 8px), 8px)" }}
+        >
+          <SpeechWave enabled={isMicActive} className="h-8" />
+        </div>
 
-        {/* Camera Feed */}
-        <div
-          className="relative mx-auto mb-6 w-full max-w-md overflow-hidden rounded-2xl bg-muted"
-          style={{ aspectRatio: "4/3" }}
+        {/* Camera Feed Container - Dominant element */}
+        <div 
+          className="relative flex-1 bg-background overflow-hidden"
           role="img"
           aria-label={
             isCameraActive
@@ -72,87 +77,119 @@ const Assist = () => {
               : "Camera feed inactive"
           }
         >
+          {/* Video element - fills container while maintaining aspect ratio */}
           <video
             ref={videoRef}
-            className={`h-full w-full object-cover ${isCameraActive ? "block" : "hidden"}`}
+            className={`absolute inset-0 h-full w-full object-cover ${isCameraActive ? "block" : "hidden"}`}
             playsInline
             muted
             aria-hidden={!isCameraActive}
           />
+          
+          {/* Inactive state placeholder */}
           {!isCameraActive && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
-              <CameraOff className="mb-2 h-16 w-16" aria-hidden="true" />
-              <span className="text-lg">Camera inactive</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/30 text-muted-foreground">
+              <CameraOff className="mb-4 h-20 w-20 sm:h-24 sm:w-24" aria-hidden="true" />
+              <span className="text-xl sm:text-2xl font-medium">Camera inactive</span>
+              <span className="mt-2 text-base sm:text-lg text-muted-foreground/80">
+                Tap the camera button to start
+              </span>
+            </div>
+          )}
+
+          {/* Status overlay - top, semi-transparent */}
+          <div 
+            className="absolute top-0 inset-x-0 z-10 pointer-events-none"
+            style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 48px)" }}
+          >
+            <div className="mx-auto px-4 pt-2">
+              <div 
+                className="mx-auto max-w-xs rounded-full bg-background/80 backdrop-blur-sm px-4 py-2 text-center shadow-lg"
+                role="status"
+                aria-live="polite"
+              >
+                <p className="text-sm font-medium text-foreground">
+                  {statusText}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Error overlay */}
+          {(cameraError || micError) && (
+            <div 
+              className="absolute top-20 inset-x-4 z-20 mx-auto max-w-md"
+              style={{ top: "max(env(safe-area-inset-top, 0px) + 80px, 80px)" }}
+            >
+              <div
+                role="alert"
+                className="rounded-xl bg-destructive/95 backdrop-blur-sm p-4 text-center text-destructive-foreground shadow-lg"
+              >
+                {cameraError && <p className="font-medium">{cameraError}</p>}
+                {micError && <p className="font-medium">{micError}</p>}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Control Buttons */}
-        <div className="flex justify-center gap-6">
-          <button
-            type="button"
-            onClick={handleCameraToggle}
-            className={`flex h-20 w-20 flex-col items-center justify-center rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2 ${
-              isCameraActive
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-            aria-pressed={isCameraActive}
-            aria-label={isCameraActive ? "Stop camera" : "Start camera"}
-          >
-            {isCameraActive ? (
-              <Camera className="h-8 w-8" aria-hidden="true" />
-            ) : (
-              <CameraOff className="h-8 w-8" aria-hidden="true" />
-            )}
-            <span className="mt-1">{isCameraActive ? "On" : "Off"}</span>
-          </button>
+        {/* Control buttons overlay - bottom, above nav */}
+        <div 
+          className="absolute bottom-20 inset-x-0 z-10 pb-4"
+          style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px) + 16px, 16px)" }}
+        >
+          <div className="flex justify-center gap-6 sm:gap-8">
+            {/* Camera toggle button */}
+            <button
+              type="button"
+              onClick={handleCameraToggle}
+              className={`flex h-18 w-18 sm:h-20 sm:w-20 flex-col items-center justify-center rounded-full text-sm font-semibold shadow-xl transition-all focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2 focus:ring-offset-transparent active:scale-95 ${
+                isCameraActive
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-background/90 backdrop-blur-sm text-foreground hover:bg-background"
+              }`}
+              style={{ 
+                minWidth: "72px", 
+                minHeight: "72px",
+                width: "clamp(72px, 18vw, 80px)",
+                height: "clamp(72px, 18vw, 80px)"
+              }}
+              aria-pressed={isCameraActive}
+              aria-label={isCameraActive ? "Stop camera" : "Start camera"}
+            >
+              {isCameraActive ? (
+                <Camera className="h-8 w-8 sm:h-9 sm:w-9" aria-hidden="true" />
+              ) : (
+                <CameraOff className="h-8 w-8 sm:h-9 sm:w-9" aria-hidden="true" />
+              )}
+              <span className="mt-1 text-xs sm:text-sm">{isCameraActive ? "On" : "Off"}</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={handleMicToggle}
-            className={`flex h-20 w-20 flex-col items-center justify-center rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2 ${
-              isMicActive
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-            aria-pressed={isMicActive}
-            aria-label={isMicActive ? "Stop microphone" : "Start microphone"}
-          >
-            {isMicActive ? (
-              <Mic className="h-8 w-8" aria-hidden="true" />
-            ) : (
-              <MicOff className="h-8 w-8" aria-hidden="true" />
-            )}
-            <span className="mt-1">{isMicActive ? "On" : "Off"}</span>
-          </button>
-        </div>
-
-        {/* Error Messages */}
-        {(cameraError || micError) && (
-          <div
-            role="alert"
-            className="mx-auto mt-6 max-w-md rounded-lg bg-destructive/10 p-4 text-center text-destructive"
-          >
-            {cameraError && <p>{cameraError}</p>}
-            {micError && <p>{micError}</p>}
+            {/* Microphone toggle button */}
+            <button
+              type="button"
+              onClick={handleMicToggle}
+              className={`flex h-18 w-18 sm:h-20 sm:w-20 flex-col items-center justify-center rounded-full text-sm font-semibold shadow-xl transition-all focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2 focus:ring-offset-transparent active:scale-95 ${
+                isMicActive
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-background/90 backdrop-blur-sm text-foreground hover:bg-background"
+              }`}
+              style={{ 
+                minWidth: "72px", 
+                minHeight: "72px",
+                width: "clamp(72px, 18vw, 80px)",
+                height: "clamp(72px, 18vw, 80px)"
+              }}
+              aria-pressed={isMicActive}
+              aria-label={isMicActive ? "Stop microphone" : "Start microphone"}
+            >
+              {isMicActive ? (
+                <Mic className="h-8 w-8 sm:h-9 sm:w-9" aria-hidden="true" />
+              ) : (
+                <MicOff className="h-8 w-8 sm:h-9 sm:w-9" aria-hidden="true" />
+              )}
+              <span className="mt-1 text-xs sm:text-sm">{isMicActive ? "On" : "Off"}</span>
+            </button>
           </div>
-        )}
-
-        {/* Status Text */}
-        <p className="mx-auto mt-6 max-w-md text-center text-muted-foreground">
-          {isCameraActive && isMicActive
-            ? "Camera and microphone are active. Point your camera at your surroundings and speak naturally."
-            : isCameraActive
-              ? "Camera is active. Tap microphone to enable voice input."
-              : isMicActive
-                ? "Microphone is active. Tap camera to see your surroundings."
-                : "Tap the buttons above to activate camera or microphone assistance."}
-        </p>
-
-        {/* Speech Wave Visualization - Top center, respects safe areas */}
-        <div className="fixed top-0 left-1/2 -translate-x-1/2 z-10 pt-[env(safe-area-inset-top,12px)] mt-3">
-          <SpeechWave enabled={isMicActive} className="h-8" />
         </div>
       </div>
     </Layout>
