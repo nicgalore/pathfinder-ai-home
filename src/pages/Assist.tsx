@@ -126,11 +126,11 @@ const Assist = () => {
           )}
         </div>
 
-        {/* Caption display - above control buttons */}
+        {/* Caption display - lower-middle of screen, above control buttons */}
         {caption && (
           <div 
-            className="absolute bottom-44 inset-x-0 z-10 flex justify-center px-4 pointer-events-none"
-            style={{ bottom: "max(env(safe-area-inset-bottom, 0px) + 176px, 176px)" }}
+            className="absolute inset-x-0 z-10 flex justify-center px-4 pointer-events-none"
+            style={{ bottom: "max(env(safe-area-inset-bottom, 0px) + 260px, 280px)" }}
           >
             <div 
               key={captionKey}
