@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Mic, MicOff, Camera, CameraOff } from "lucide-react";
 import { Layout } from "@/components/Layout";
+import { SpeechWave } from "@/components/SpeechWave";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useMediaDevices } from "@/hooks/useMediaDevices";
 
@@ -148,6 +149,11 @@ const Assist = () => {
                 ? "Microphone is active. Tap camera to see your surroundings."
                 : "Tap the buttons above to activate camera or microphone assistance."}
         </p>
+
+        {/* Speech Wave Visualization */}
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-10">
+          <SpeechWave enabled={isMicActive} className="h-8" />
+        </div>
       </div>
     </Layout>
   );

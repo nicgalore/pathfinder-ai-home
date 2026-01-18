@@ -2,9 +2,9 @@ import { useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { Layout } from "@/components/Layout";
+import { SpeechWave } from "@/components/SpeechWave";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
-
 const Index = () => {
   const navigate = useNavigate();
   const { announceOnLoad, speak } = useVoiceAnnouncement();
@@ -28,7 +28,7 @@ const Index = () => {
     [handleStartAssistance]
   );
 
-  useVoiceRecognition({
+  const { isListening } = useVoiceRecognition({
     commands: voiceCommands,
     onCommandDetected: handleCommandDetected,
     enabled: true,
@@ -79,6 +79,11 @@ const Index = () => {
           Use your camera and voice to receive real-time guidance, object
           descriptions, and obstacle awareness.
         </p>
+
+        {/* Speech Wave Visualization */}
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-10">
+          <SpeechWave enabled={isListening} className="h-8" />
+        </div>
       </div>
     </Layout>
   );
