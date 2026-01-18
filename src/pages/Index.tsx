@@ -1,12 +1,39 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
+import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { announceOnLoad } = useVoiceAnnouncement();
+  const { announceOnLoad, speak } = useVoiceAnnouncement();
+
+  const handleStartAssistance = useCallback(() => {
+    navigate("/assist");
+  }, [navigate]);
+
+  const handleCommandDetected = useCallback(
+    (phrase: string) => {
+      // Speak confirmation before navigating
+      speak("Starting assistance.", "assertive");
+    },
+    [speak]
+  );
+
+  // Voice command recognition
+  const voiceCommands = [
+    {
+      phrases: ["start assistance", "begin", "help me navigate"],
+      action: handleStartAssistance,
+    },
+  ];
+
+  useVoiceRecognition({
+    commands: voiceCommands,
+    onCommandDetected: handleCommandDetected,
+    enabled: true,
+  });
 
   useEffect(() => {
     // Announce readiness on page load
@@ -18,10 +45,6 @@ const Index = () => {
 
     return () => clearTimeout(timer);
   }, [announceOnLoad]);
-
-  const handleStartAssistance = () => {
-    navigate("/assist");
-  };
 
   return (
     <Layout>
