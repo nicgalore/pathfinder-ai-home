@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SpeechWave } from "@/components/SpeechWave";
-import { WalkingRadarAnimation } from "@/components/WalkingRadarAnimation";
+import { PhoneSonarAnimation } from "@/components/PhoneSonarAnimation";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
@@ -65,8 +65,8 @@ const Index = () => {
       </div>
 
       <div className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6">
-        {/* Walking Radar Animation */}
-        <WalkingRadarAnimation size={280} className="mb-4" />
+        {/* Phone Sonar Animation - Object Awareness */}
+        <PhoneSonarAnimation size={240} className="mb-6" />
 
         <header className="mb-12 text-center">
           <h1 className="mb-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
