@@ -1,27 +1,36 @@
-import { useEffect, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { SpeechWave } from "@/components/SpeechWave";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
+
 const Index = () => {
   const navigate = useNavigate();
   const { announceOnLoad, speak } = useVoiceAnnouncement();
+  const [commandStatus, setCommandStatus] = useState("");
 
   const handleStartAssistance = useCallback(() => {
     navigate("/assist");
   }, [navigate]);
 
-  const handleCommandDetected = useCallback(() => {
+  const handleCommandDetected = useCallback((phrase: string) => {
+    // Update hidden status for screen readers
+    setCommandStatus(`Voice command detected: ${phrase}. Starting assistance.`);
     speak("Starting assistance.", "assertive");
   }, [speak]);
 
-  // Memoize commands to prevent unnecessary re-renders
+  // Memoize commands with all recognized phrases
   const voiceCommands = useMemo(
     () => [
       {
-        phrases: ["start assistance", "begin", "help me navigate"],
+        phrases: [
+          "start assistance",
+          "begin assistance", 
+          "help me navigate",
+          "start"
+        ],
         action: handleStartAssistance,
       },
     ],
@@ -37,7 +46,7 @@ const Index = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       announceOnLoad(
-        "PathFinder AI is ready. Say 'Start assistance' or press the Start Assistance button."
+        "PathFinder AI is ready. You can say 'Start assistance' to begin."
       );
     }, 500);
 
@@ -46,6 +55,11 @@ const Index = () => {
 
   return (
     <Layout>
+      {/* Hidden live region for voice command status */}
+      <div className="sr-only" role="status" aria-live="assertive" aria-atomic="true">
+        {commandStatus}
+      </div>
+
       <div className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6">
         <header className="mb-12 text-center">
           <h1 className="mb-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
