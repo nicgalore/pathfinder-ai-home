@@ -99,13 +99,15 @@ export function useVoiceRecognition({
       };
 
       recognition.onend = () => {
-        setIsListening(false);
         if (!isProcessingRef.current && enabled) {
+          // Auto-restart without toggling isListening to prevent flicker
           setTimeout(() => {
             if (!isProcessingRef.current) {
               startListening();
             }
           }, 100);
+        } else {
+          setIsListening(false);
         }
       };
 
