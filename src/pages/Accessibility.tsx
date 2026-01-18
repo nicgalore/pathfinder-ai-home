@@ -60,7 +60,7 @@ const Accessibility = () => {
           <h2 className="mb-2 text-lg font-semibold text-primary-foreground">
             Need Assistance?
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-primary-foreground/90">
             Say "Help" at any time for voice guidance, or use keyboard shortcuts to navigate quickly.
           </p>
         </section>
