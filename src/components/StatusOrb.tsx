@@ -1,6 +1,6 @@
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Sphere, MeshDistortMaterial } from "@react-three/drei";
+import { Sphere } from "@react-three/drei";
 import * as THREE from "three";
 
 interface StatusOrbProps {
@@ -27,33 +27,23 @@ function AnimatedSphere({ isListening, audioLevel, prefersReducedMotion }: Anima
     return new THREE.Color().setHSL(hue / 360, saturation, lightness);
   }, [audioLevel]);
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     if (!meshRef.current || prefersReducedMotion) return;
 
-    // Spin based on audio level
-    if (isListening) {
-      const rotationSpeed = 0.5 + audioLevel * 4;
-      meshRef.current.rotation.y += delta * rotationSpeed;
-      meshRef.current.rotation.x += delta * rotationSpeed * 0.3;
-    } else {
-      // Gentle idle rotation
-      meshRef.current.rotation.y += delta * 0.1;
-    }
+    // Spin based on audio level: 0.5° to 8° per frame
+    const rotationSpeed = isListening 
+      ? THREE.MathUtils.degToRad(0.5 + audioLevel * 7.5)
+      : THREE.MathUtils.degToRad(0.2);
+    
+    meshRef.current.rotation.y += rotationSpeed;
   });
-
-  // Distortion amount based on listening state and audio
-  const distort = isListening ? 0.3 + audioLevel * 0.4 : 0.2;
-  const speed = isListening ? 2 + audioLevel * 4 : 1;
 
   return (
     <Sphere ref={meshRef} args={[1, 64, 64]}>
-      <MeshDistortMaterial
+      <meshStandardMaterial
         color={color}
         roughness={0.2}
         metalness={0.8}
-        distort={prefersReducedMotion ? 0.1 : distort}
-        speed={prefersReducedMotion ? 0 : speed}
-        envMapIntensity={1}
       />
     </Sphere>
   );
