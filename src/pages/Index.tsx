@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { Layout } from "@/components/Layout";
@@ -13,21 +13,20 @@ const Index = () => {
     navigate("/assist");
   }, [navigate]);
 
-  const handleCommandDetected = useCallback(
-    (phrase: string) => {
-      // Speak confirmation before navigating
-      speak("Starting assistance.", "assertive");
-    },
-    [speak]
-  );
+  const handleCommandDetected = useCallback(() => {
+    speak("Starting assistance.", "assertive");
+  }, [speak]);
 
-  // Voice command recognition
-  const voiceCommands = [
-    {
-      phrases: ["start assistance", "begin", "help me navigate"],
-      action: handleStartAssistance,
-    },
-  ];
+  // Memoize commands to prevent unnecessary re-renders
+  const voiceCommands = useMemo(
+    () => [
+      {
+        phrases: ["start assistance", "begin", "help me navigate"],
+        action: handleStartAssistance,
+      },
+    ],
+    [handleStartAssistance]
+  );
 
   useVoiceRecognition({
     commands: voiceCommands,
@@ -36,7 +35,6 @@ const Index = () => {
   });
 
   useEffect(() => {
-    // Announce readiness on page load
     const timer = setTimeout(() => {
       announceOnLoad(
         "PathFinder AI is ready. Say 'Start assistance' or press the Start Assistance button."
@@ -48,29 +46,23 @@ const Index = () => {
 
   return (
     <Layout>
-      {/* ARIA Live Region for screen reader announcements */}
-      <div
-        id="aria-live-region"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      />
-
       <div className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6">
-        {/* Header */}
         <header className="mb-12 text-center">
           <h1 className="mb-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             PathFinder AI
           </h1>
           <p className="text-lg text-muted-foreground sm:text-xl">
-            Voice-guided assistance to help you understand and navigate your surroundings.
+            Voice-guided assistance to help you understand and navigate your
+            surroundings.
           </p>
         </header>
 
-        {/* Primary Action */}
-        <div className="mb-10">
+        <div className="mb-10" role="group" aria-labelledby="action-heading">
+          <h2 id="action-heading" className="sr-only">
+            Primary action
+          </h2>
           <button
+            type="button"
             onClick={handleStartAssistance}
             className="btn-primary-large"
             aria-describedby="start-description"
@@ -80,12 +72,12 @@ const Index = () => {
           </button>
         </div>
 
-        {/* Supporting Text */}
         <p
           id="start-description"
           className="max-w-md text-center text-base text-muted-foreground sm:text-lg"
         >
-          Use your camera and voice to receive real-time guidance, object descriptions, and obstacle awareness.
+          Use your camera and voice to receive real-time guidance, object
+          descriptions, and obstacle awareness.
         </p>
       </div>
     </Layout>
