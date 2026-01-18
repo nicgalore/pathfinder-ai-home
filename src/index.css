@@ -48,11 +48,12 @@
     --focus-ring: 221 83% 53%;
     --focus-ring-offset: 0 0% 100%;
 
-    /* Navigation */
+    /* Navigation - Solid white bar */
     --nav-background: 0 0% 100%;
-    --nav-foreground: 215 16% 40%;
-    --nav-active: 221 83% 53%;
-    --nav-active-foreground: 0 0% 100%;
+    --nav-foreground: 220 9% 46%;
+    --nav-active: 200 98% 39%;
+    --nav-active-foreground: 200 98% 39%;
+    --nav-border: 220 13% 91%;
 
     /* Sidebar defaults */
     --sidebar-background: 0 0% 98%;
@@ -115,8 +116,9 @@
 
     --nav-background: 222 47% 11%;
     --nav-foreground: 215 20% 65%;
-    --nav-active: 217 91% 60%;
-    --nav-active-foreground: 222 47% 8%;
+    --nav-active: 198 93% 59%;
+    --nav-active-foreground: 198 93% 59%;
+    --nav-border: 215 19% 20%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 210 40% 98%;
@@ -177,21 +179,22 @@
 
   /* Bottom navigation */
   .nav-item {
-    @apply flex flex-1 flex-col items-center justify-center gap-1 py-3 text-nav-foreground transition-colors;
-    @apply hover:text-foreground;
-    @apply focus-visible:bg-secondary focus-visible:text-foreground;
+    @apply flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors;
+    @apply text-gray-500 dark:text-gray-400;
+    @apply hover:text-gray-700 dark:hover:text-gray-300;
+    @apply focus-visible:bg-gray-100 dark:focus-visible:bg-gray-800;
     min-height: 64px;
   }
 
   .nav-item-active {
-    @apply text-nav-active font-semibold;
+    @apply text-primary font-bold;
   }
 
   .nav-item-icon {
-    @apply h-7 w-7;
+    @apply h-6 w-6;
   }
 
   .nav-item-label {
-    @apply text-sm font-medium;
+    @apply text-xs font-medium;
   }
 }
