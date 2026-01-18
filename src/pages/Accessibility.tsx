@@ -49,7 +49,7 @@ const Accessibility = () => {
         className="sr-only"
       />
 
-      <div className="px-6 py-10">
+      <div className="px-6 py-10 pb-8">
         <header className="mb-10 text-center">
           <h1 className="mb-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Accessibility
