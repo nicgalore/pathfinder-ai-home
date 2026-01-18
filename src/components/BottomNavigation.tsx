@@ -32,10 +32,17 @@ export function BottomNavigation() {
                 <IconComponent
                   className="nav-item-icon"
                   aria-hidden="true"
-                  strokeWidth={1.75}
-                  fill={isActive ? "currentColor" : "none"}
+                  strokeWidth={isActive ? 2.25 : 1.75}
+                  fill="none"
                 />
                 <span className="nav-item-label">{item.label}</span>
+                {/* Active indicator line */}
+                <span 
+                  className={`absolute bottom-1 left-1/2 -translate-x-1/2 h-0.5 rounded-full transition-all ${
+                    isActive ? "w-5 bg-primary" : "w-0 bg-transparent"
+                  }`}
+                  aria-hidden="true"
+                />
               </NavLink>
             </li>
           );
