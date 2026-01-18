@@ -130,7 +130,7 @@ const Assist = () => {
         {caption && (
           <div 
             className="absolute inset-x-0 z-10 flex justify-center px-4 pointer-events-none"
-            style={{ bottom: "max(env(safe-area-inset-bottom, 0px) + 164px, 184px)" }}
+            style={{ bottom: "max(env(safe-area-inset-bottom, 0px) + 244px, 264px)" }}
           >
             <div 
               key={captionKey}
