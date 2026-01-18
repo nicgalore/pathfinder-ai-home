@@ -57,7 +57,7 @@ const Accessibility = () => {
         </ul>
 
         <section className="mx-auto mt-10 max-w-lg rounded-xl p-6 bg-primary">
-          <h2 className="mb-2 text-lg font-semibold text-foreground">
+          <h2 className="mb-2 text-lg font-semibold text-primary-foreground">
             Need Assistance?
           </h2>
           <p className="text-muted-foreground">
