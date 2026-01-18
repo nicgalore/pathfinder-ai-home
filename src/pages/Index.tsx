@@ -2,8 +2,8 @@ import { useEffect, useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { Layout } from "@/components/Layout";
-
 import { Logo } from "@/components/Logo";
+import { StatusOrb } from "@/components/StatusOrb";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
@@ -74,7 +74,7 @@ const Index = () => {
           </p>
         </header>
 
-        <div className="mb-10" role="group" aria-labelledby="action-heading">
+        <div className="mb-6 flex flex-col items-center" role="group" aria-labelledby="action-heading">
           <h2 id="action-heading" className="sr-only">
             Primary action
           </h2>
@@ -87,6 +87,23 @@ const Index = () => {
             <Mic className="h-8 w-8" aria-hidden="true" />
             <span>Start Assistance</span>
           </button>
+          
+          {/* Voice command hint with orb indicator */}
+          <div className="mt-6 flex flex-col items-center gap-3">
+            <StatusOrb 
+              size={48} 
+              isListening={isListening} 
+              audioLevel={isListening ? 0.15 : 0} 
+            />
+            <p className="text-base font-medium text-foreground sm:text-lg">
+              Or say <span className="font-bold text-primary">"Start Assistance"</span> to begin
+            </p>
+            {isListening && (
+              <span className="text-sm text-muted-foreground animate-pulse">
+                Listening...
+              </span>
+            )}
+          </div>
         </div>
 
         <p
