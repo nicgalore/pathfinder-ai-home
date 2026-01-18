@@ -50,26 +50,25 @@ const Assist = () => {
     hasActivatedRef.current = true;
     setWakeWordEnabled(false);
     
-    const msg = "Starting assistance...";
-    speak(msg, "polite");
-    showCaption(msg);
-    
     // Start camera first
     const cameraStarted = await startCamera();
-    if (cameraStarted) {
-      showCaption("Camera activated.");
-    }
     
     // Then start microphone
     const micStarted = await startMicrophone();
-    if (micStarted) {
-      showCaption("Microphone activated. Listening.");
-    }
     
+    // Announce full state change for voice-first users
     if (cameraStarted && micStarted) {
-      setTimeout(() => {
-        showCaption("Assistance mode ready.");
-      }, 1000);
+      const msg = "Assist mode active. Camera and microphone are now on. How can I help you?";
+      speak(msg, "assertive");
+      showCaption(msg);
+    } else if (cameraStarted) {
+      const msg = "Camera activated. Microphone failed to start.";
+      speak(msg, "assertive");
+      showCaption(msg);
+    } else if (micStarted) {
+      const msg = "Microphone activated. Camera failed to start.";
+      speak(msg, "assertive");
+      showCaption(msg);
     }
   }, [speak, showCaption, startCamera, startMicrophone]);
 
