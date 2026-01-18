@@ -1,49 +1,91 @@
-import { useEffect, useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 export function useVoiceAnnouncement() {
-  const speak = useCallback((message: string, priority: "polite" | "assertive" = "polite") => {
-    // Cancel any ongoing speech
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
+  const isSpeakingRef = useRef(false);
 
-      const utterance = new SpeechSynthesisUtterance(message);
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-
-      // Use a clear, accessible voice if available
-      const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(
-        (voice) => voice.lang.startsWith("en") && voice.localService
-      );
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
+  const speak = useCallback(
+    (message: string, priority: "polite" | "assertive" = "polite") => {
+      // Prevent overlapping announcements
+      if (isSpeakingRef.current) {
+        return;
       }
 
-      window.speechSynthesis.speak(utterance);
-    }
+      // Update ARIA live region first (works without speech synthesis)
+      const liveRegion = document.getElementById("aria-live-region");
+      if (liveRegion) {
+        liveRegion.setAttribute("aria-live", priority);
+        // Clear and set to trigger announcement
+        liveRegion.textContent = "";
+        requestAnimationFrame(() => {
+          liveRegion.textContent = message;
+        });
+      }
 
-    // Also update ARIA live region for screen readers
-    const liveRegion = document.getElementById("aria-live-region");
-    if (liveRegion) {
-      liveRegion.setAttribute("aria-live", priority);
-      liveRegion.textContent = message;
-    }
-  }, []);
+      // Speech synthesis is optional enhancement
+      if ("speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.cancel();
+          isSpeakingRef.current = true;
 
-  const announceOnLoad = useCallback((message: string) => {
-    // Wait for voices to load, then speak
-    if ("speechSynthesis" in window) {
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        speak(message, "assertive");
-      } else {
-        window.speechSynthesis.onvoiceschanged = () => {
+          const utterance = new SpeechSynthesisUtterance(message);
+          utterance.rate = 0.9;
+          utterance.pitch = 1;
+          utterance.volume = 1;
+
+          const voices = window.speechSynthesis.getVoices();
+          const preferredVoice = voices.find(
+            (voice) => voice.lang.startsWith("en") && voice.localService
+          );
+          if (preferredVoice) {
+            utterance.voice = preferredVoice;
+          }
+
+          utterance.onend = () => {
+            isSpeakingRef.current = false;
+          };
+
+          utterance.onerror = () => {
+            isSpeakingRef.current = false;
+          };
+
+          window.speechSynthesis.speak(utterance);
+        } catch {
+          // Fail silently - ARIA live region still works
+          isSpeakingRef.current = false;
+        }
+      }
+    },
+    []
+  );
+
+  const announceOnLoad = useCallback(
+    (message: string) => {
+      if ("speechSynthesis" in window) {
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
           speak(message, "assertive");
-        };
+        } else {
+          // Wait for voices to load
+          const handleVoicesChanged = () => {
+            speak(message, "assertive");
+            window.speechSynthesis.onvoiceschanged = null;
+          };
+          window.speechSynthesis.onvoiceschanged = handleVoicesChanged;
+
+          // Fallback if voices never load
+          setTimeout(() => {
+            if (!isSpeakingRef.current) {
+              speak(message, "assertive");
+            }
+          }, 1000);
+        }
+      } else {
+        // Still announce via ARIA even without speech
+        speak(message, "assertive");
       }
-    }
-  }, [speak]);
+    },
+    [speak]
+  );
 
   return { speak, announceOnLoad };
 }
