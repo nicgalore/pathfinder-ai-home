@@ -33,7 +33,7 @@ export function Layout({ children }: LayoutProps) {
         </a>
         <main
           id="main-content"
-          className="flex-1 pb-20"
+          className="flex-1 pb-24"
           tabIndex={-1}
           role="main"
         >
