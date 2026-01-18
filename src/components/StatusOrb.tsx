@@ -19,13 +19,46 @@ interface AnimatedSphereProps {
 function AnimatedSphere({ isListening, audioLevel, prefersReducedMotion }: AnimatedSphereProps) {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  // Create gradient-like color based on audio level
-  const color = useMemo(() => {
-    const hue = 200;
-    const saturation = 0.98;
-    const lightness = 0.5 + audioLevel * 0.15;
-    return new THREE.Color().setHSL(hue / 360, saturation, lightness);
-  }, [audioLevel]);
+  // Create a gradient shader material so rotation is visible
+  const material = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        colorA: { value: new THREE.Color().setHSL(200 / 360, 0.98, 0.7) },
+        colorB: { value: new THREE.Color().setHSL(200 / 360, 0.98, 0.35) },
+        colorC: { value: new THREE.Color().setHSL(210 / 360, 0.95, 0.55) },
+      },
+      vertexShader: `
+        varying vec3 vNormal;
+        varying vec3 vPosition;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vPosition = position;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 colorA;
+        uniform vec3 colorB;
+        uniform vec3 colorC;
+        varying vec3 vNormal;
+        varying vec3 vPosition;
+        void main() {
+          // Create a swirl pattern based on position
+          float angle = atan(vPosition.x, vPosition.z);
+          float pattern = sin(angle * 3.0 + vPosition.y * 2.0) * 0.5 + 0.5;
+          
+          // Blend colors based on pattern and height
+          vec3 color = mix(colorA, colorB, pattern);
+          color = mix(color, colorC, smoothstep(-0.5, 0.5, vPosition.y) * 0.5);
+          
+          // Add lighting based on normal
+          float light = dot(vNormal, normalize(vec3(1.0, 1.0, 1.0))) * 0.3 + 0.7;
+          
+          gl_FragColor = vec4(color * light, 1.0);
+        }
+      `,
+    });
+  }, []);
 
   useFrame(() => {
     if (!meshRef.current || prefersReducedMotion) return;
@@ -39,13 +72,7 @@ function AnimatedSphere({ isListening, audioLevel, prefersReducedMotion }: Anima
   });
 
   return (
-    <Sphere ref={meshRef} args={[1, 64, 64]}>
-      <meshStandardMaterial
-        color={color}
-        roughness={0.2}
-        metalness={0.8}
-      />
-    </Sphere>
+    <Sphere ref={meshRef} args={[1, 64, 64]} material={material} />
   );
 }
 
@@ -78,14 +105,8 @@ export function StatusOrb({
         {/* Lighting */}
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 5, 5]} intensity={1} color="#ffffff" />
-        <directionalLight position={[-3, -3, 2]} intensity={0.5} color="#88ccff" />
-        <pointLight 
-          position={[0, 0, 3]} 
-          intensity={isListening ? 0.5 + audioLevel : 0.3} 
-          color="#00aaff" 
-        />
 
-        {/* 3D Sphere */}
+        {/* 3D Sphere with visible gradient pattern */}
         <AnimatedSphere
           isListening={isListening}
           audioLevel={audioLevel}
