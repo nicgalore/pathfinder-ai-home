@@ -5,6 +5,8 @@ import { Layout } from "@/components/Layout";
 import { SpeechWave } from "@/components/SpeechWave";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
+import illustrationHero from "@/assets/illustration-home-hero.png";
+import illustrationLamp from "@/assets/illustration-lamp.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -16,12 +18,10 @@ const Index = () => {
   }, [navigate]);
 
   const handleCommandDetected = useCallback((phrase: string) => {
-    // Update hidden status for screen readers
     setCommandStatus(`Voice command detected: ${phrase}. Starting assistance.`);
     speak("Starting assistance.", "assertive");
   }, [speak]);
 
-  // Memoize commands with all recognized phrases
   const voiceCommands = useMemo(
     () => [
       {
@@ -60,8 +60,36 @@ const Index = () => {
         {commandStatus}
       </div>
 
-      <div className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6">
-        <header className="mb-12 text-center">
+      {/* Decorative illustrations - hidden from screen readers */}
+      <div 
+        className="fixed bottom-20 left-4 opacity-40 pointer-events-none hidden sm:block"
+        aria-hidden="true"
+        role="presentation"
+      >
+        <img 
+          src={illustrationLamp} 
+          alt="" 
+          className="w-24 md:w-32 lg:w-40"
+          loading="lazy"
+        />
+      </div>
+
+      <div className="relative flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6">
+        {/* Hero illustration - subtle background */}
+        <div 
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none z-0"
+          aria-hidden="true"
+          role="presentation"
+        >
+          <img 
+            src={illustrationHero} 
+            alt="" 
+            className="w-72 sm:w-96 md:w-[28rem]"
+            loading="lazy"
+          />
+        </div>
+
+        <header className="relative z-10 mb-12 text-center">
           <h1 className="mb-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             PathFinder AI
           </h1>
@@ -71,7 +99,7 @@ const Index = () => {
           </p>
         </header>
 
-        <div className="mb-10" role="group" aria-labelledby="action-heading">
+        <div className="relative z-10 mb-10" role="group" aria-labelledby="action-heading">
           <h2 id="action-heading" className="sr-only">
             Primary action
           </h2>
@@ -88,13 +116,13 @@ const Index = () => {
 
         <p
           id="start-description"
-          className="max-w-md text-center text-base text-muted-foreground sm:text-lg"
+          className="relative z-10 max-w-md text-center text-base text-muted-foreground sm:text-lg"
         >
           Use your camera and voice to receive real-time guidance, object
           descriptions, and obstacle awareness.
         </p>
 
-        {/* Speech Wave Visualization - Top center, respects safe areas */}
+        {/* Speech Wave Visualization */}
         <div className="fixed top-0 left-1/2 -translate-x-1/2 z-10 pt-[env(safe-area-inset-top,12px)] mt-3">
           <SpeechWave enabled={isListening} className="h-8" />
         </div>
