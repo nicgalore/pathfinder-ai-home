@@ -32,20 +32,13 @@ function AnimatedSphere({ isListening, audioLevel, prefersReducedMotion }: Anima
 
     // Spin based on audio level
     if (isListening) {
-      const rotationSpeed = 0.3 + audioLevel * 2;
+      const rotationSpeed = 0.5 + audioLevel * 4;
       meshRef.current.rotation.y += delta * rotationSpeed;
       meshRef.current.rotation.x += delta * rotationSpeed * 0.3;
     } else {
       // Gentle idle rotation
       meshRef.current.rotation.y += delta * 0.1;
     }
-
-    // Scale pulse based on audio
-    const targetScale = 1 + audioLevel * 0.2;
-    meshRef.current.scale.lerp(
-      new THREE.Vector3(targetScale, targetScale, targetScale),
-      0.1
-    );
   });
 
   // Distortion amount based on listening state and audio
