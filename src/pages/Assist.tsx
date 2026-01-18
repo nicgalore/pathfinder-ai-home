@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { StatusOrb } from "@/components/StatusOrb";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
 import { useMediaDevices } from "@/hooks/useMediaDevices";
+import { useAudioAnalyzer } from "@/hooks/useAudioAnalyzer";
 
 const Assist = () => {
   const { announceOnLoad, speak } = useVoiceAnnouncement();
@@ -28,6 +29,13 @@ const Assist = () => {
       speak(error, "assertive");
       showCaption(error);
     },
+  });
+
+  // Audio analyzer for voice activity visualization
+  const { audioLevel } = useAudioAnalyzer({
+    enabled: isMicActive,
+    smoothingTimeConstant: 0.5,
+    silenceThreshold: 0.05,
   });
 
   useEffect(() => {
@@ -75,7 +83,11 @@ const Assist = () => {
           className="absolute top-0 left-1/2 -translate-x-1/2 z-20"
           style={{ paddingTop: "max(env(safe-area-inset-top, 0px) + 16px, 24px)" }}
         >
-          <StatusOrb size={60} />
+          <StatusOrb 
+            size={60} 
+            isListening={isMicActive} 
+            audioLevel={audioLevel} 
+          />
         </div>
 
         {/* Camera Feed Container - Dominant element */}
