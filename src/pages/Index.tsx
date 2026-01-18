@@ -1,6 +1,7 @@
-import { useEffect, useCallback, useMemo, useState } from "react";
+import { useEffect, useCallback, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
+import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import { Layout } from "@/components/Layout";
 import { SpeechWave } from "@/components/SpeechWave";
 import { useVoiceAnnouncement } from "@/hooks/useVoiceAnnouncement";
@@ -10,6 +11,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { announceOnLoad, speak } = useVoiceAnnouncement();
   const [commandStatus, setCommandStatus] = useState("");
+  const lottieRef = useRef<LottieRefCurrentProps>(null);
 
   const handleStartAssistance = useCallback(() => {
     navigate("/assist");
@@ -64,6 +66,22 @@ const Index = () => {
       </div>
 
       <div className="flex min-h-[calc(100vh-80px)] flex-col items-center justify-center px-6">
+        {/* Lottie Animation Container */}
+        <div 
+          className="mb-6 flex items-center justify-center"
+          style={{ width: 300, height: 300 }}
+          aria-hidden="true"
+        >
+          <Lottie
+            lottieRef={lottieRef}
+            loop
+            autoplay
+            style={{ width: "100%", height: "100%", background: "transparent" }}
+            // Animation data will be loaded here - placeholder for now
+            animationData={undefined}
+          />
+        </div>
+
         <header className="mb-12 text-center">
           <h1 className="mb-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             PathFinder AI
