@@ -89,7 +89,7 @@ const Index = () => {
           </button>
           
           {/* Voice command hint with orb indicator */}
-          <div className="mt-6 flex flex-col items-center gap-3">
+          <div className="mt-6 flex flex-col items-center gap-3 h-[120px]">
             <StatusOrb 
               size={48} 
               isListening={isListening} 
@@ -98,11 +98,9 @@ const Index = () => {
             <p className="text-base font-medium text-foreground sm:text-lg">
               Or say <span className="font-bold text-primary">"Start Assistance"</span> to begin
             </p>
-            {isListening && (
-              <span className="text-sm text-muted-foreground animate-pulse">
-                Listening...
-              </span>
-            )}
+            <span className={`text-sm text-muted-foreground transition-opacity duration-300 ${isListening ? 'opacity-100 animate-pulse' : 'opacity-0'}`}>
+              Listening...
+            </span>
           </div>
         </div>
 
